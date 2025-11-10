@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: flask_azure_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flaskazure:
+    image: flaskazure
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 5002:5002
+    environment:
+      FLASK_ENV: development
+      DEV_DATABASE_URL: postgresql://postgres:postgres@postgres:5432/flask_azure_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app  # Mount for hot-reload in development
+
+volumes:
+  postgres_data_dev:
