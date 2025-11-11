@@ -32,6 +32,10 @@ class Config:
     """Base configuration"""
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = get_secret('SECRET-KEY') or os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+    
+    # Azure Blob Storage
+    STORAGE_ACCOUNT_NAME = os.environ.get('STORAGE_ACCOUNT_NAME', 'flaskstoragekvyas')
+    STORAGE_CONTAINER_NAME = os.environ.get('STORAGE_CONTAINER_NAME', 'images')
 
 
 class DevelopmentConfig(Config):

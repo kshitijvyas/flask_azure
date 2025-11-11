@@ -164,8 +164,30 @@ Used for multiple resources sharing same identity
 More complex setup
 Not needed for our use case
 
-TO add appinghts:
+TO add appinsights:
 Go to add resources - app insights add ifo,
-Copy insight string.
+Copy insight string add in .env file.
 Use in the code.
 INitialize the code in init.py
+
+TO Add Blob Storage:
+ Create Storage Account (Portal Steps)
+Go to Azure Portal → Search "Storage accounts" → Click "+ Create"
+
+Fill in the details:
+
+Resource Group: flask-azure-rg (same as your app)
+Storage account name: flaskstoragekvyas (must be globally unique, lowercase, no hyphens)
+Region: Canada Central (same as your app)
+Performance: Standard
+Redundancy: LRS (Locally-redundant storage) ← Cheapest, perfect for learning
+Click "Review + Create" → "Create"
+
+After creation, go to the Storage Account -> your account -> datastorage → Click "Containers" (left menu under "Data storage")
+
+Create a container:
+
+Click "+ Container"
+Name: avatars
+Public access level: Private (we'll use managed identity)
+Click "Create"
