@@ -60,9 +60,13 @@ class StorageService:
         )
         
         # Upload with content type
+        from azure.storage.blob import ContentSettings
+        
+        content_settings = ContentSettings(content_type=content_type) if content_type else None
         blob_client.upload_blob(
             file_data,
-            content_settings={'content_type': content_type} if content_type else None
+            content_settings=content_settings,
+            overwrite=True
         )
         
         # Return the blob URL
