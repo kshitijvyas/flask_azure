@@ -163,3 +163,9 @@ User-assigned:
 Used for multiple resources sharing same identity
 More complex setup
 Not needed for our use case
+
+TO add appinghts:
+Go to add resources - app insights add ifo,
+Copy insight string.
+Use in the code.
+INitialize the code in init.py

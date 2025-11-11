@@ -13,24 +13,19 @@ def create_app():
     # Load configuration based on FLASK_ENV
     app.config.from_object(get_config())
 
-    # Initialize Application Insights (Monitoring)
+    # Initialize Application Insights (Monitoring) with OpenTelemetry
     appinsights_connection_string = os.environ.get('APPLICATIONINSIGHTS_CONNECTION_STRING')
     if appinsights_connection_string:
-        from opencensus.ext.azure.log_exporter import AzureLogHandler
-        from opencensus.ext.flask.flask_middleware import FlaskMiddleware
+        from azure.monitor.opentelemetry import configure_azure_monitor
+        from opentelemetry.instrumentation.flask import FlaskInstrumentor
         
-        # Add Flask middleware for automatic request tracking
-        middleware = FlaskMiddleware(
-            app,
-            exporter=AzureLogHandler(connection_string=appinsights_connection_string)
-        )
+        # Configure Azure Monitor with OpenTelemetry
+        configure_azure_monitor(connection_string=appinsights_connection_string)
         
-        # Configure logging
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.addHandler(AzureLogHandler(connection_string=appinsights_connection_string))
-        logger.setLevel(logging.INFO)
-        app.logger.info("Application Insights enabled")
+        # Instrument Flask for automatic request tracking
+        FlaskInstrumentor().instrument_app(app)
+        
+        app.logger.info("Application Insights enabled with OpenTelemetry")
 
     # Initialize extensions
     db.init_app(app)
