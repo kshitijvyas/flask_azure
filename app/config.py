@@ -53,9 +53,18 @@ class ProductionConfig(Config):
         'postgresql://postgres:postgres@localhost:5432/flask_azure_prod'
     SECRET_KEY = get_secret('SECRET-KEY') or os.environ.get('SECRET_KEY')
     
-    # Additional production settings
-    SQLALCHEMY_POOL_SIZE = 10
-    SQLALCHEMY_POOL_RECYCLE = 3600
+    # PostgreSQL connection pool settings (for Neon.tech compatibility)
+    SQLALCHEMY_POOL_SIZE = 5
+    SQLALCHEMY_POOL_RECYCLE = 300  # Recycle connections every 5 minutes
+    SQLALCHEMY_POOL_PRE_PING = True  # Check connection before using
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'connect_args': {
+            'sslmode': 'require',  # Required for Neon.tech
+            'connect_timeout': 10
+        }
+    }
 
 
 # Configuration dictionary
