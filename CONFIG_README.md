@@ -80,3 +80,86 @@ That's it! The app automatically uses the correct:
 3. Use secure database password (not `postgres`)
 4. Set proper environment variables in Azure App Service
 5. Never commit `.env` file to Git!
+
+
+FOR AZURE DB connection:
+a. Setting -> cofiguration -> app setting.
+b. If above not found:- Settings environment variable then add below:
+1. DATABASE_URL = This is for now taken from neon.net
+2. FLASK_ENV = prod
+3. SCM_DO_BUILD_DURING_DEPLOYMENT
+4. SECRET_KEY = #Generated on terminal -- python -c "import secrets; print(secrets.token_hex(32))"
+
+Set UP cinfiguration for github:
+1. Go to Deployment Center and enter the required fields.
+
+If there is issue with the github flow then we need to download the publish profile and setup up the flow manually:-
+check.github\workflows -> azure-deploy.yml
+open downloedede settings file.
+Go to your github repo -> settings -> secrets and variables ->
+actions -> new repository secret
+Go to your GitHub repository: https://github.com/kshitijvyas/flask_azure
+Click Settings (top tab)
+In left menu, click Secrets and variables → Actions
+Click "New repository secret"
+Fill in:
+Name: AZUREAPPSERVICE_PUBLISHPROFILE
+Value: Open the .PublishSettings file and copy ALL its contents
+Click Add secret
+
+Step 4: Push Workflow to GitHub
+git add .github/workflows/azure-deploy.yml
+git commit -m "Add GitHub Actions deployment workflow"
+git push
+
+This will trigger automatic deployment!
+We can check logs on github and azure logs in development center as success.
+
+Keyvaultsetup:
+Step 1: Create Azure Key Vault
+Via Azure Portal:
+Go to Azure Portal: https://portal.azure.com
+Click "Create a resource"
+Search for "Key Vault"
+Click Create
+
+Step 2: Add Secrets to Key Vault
+Once created:
+
+Go to your Key Vault resource
+In left menu, click "Secrets" (under Objects)
+Click "+ Generate/Import"
+
+If above not works:
+Use RBAC Instead (Azure's Modern Way)
+Step 1: Assign Role to Your App
+Go to your Key Vault (flask-keyvault-kshitij) in Azure Portal
+In the left menu, click "Access control (IAM)"
+Click "+ Add" → "Add role assignment"
+Step 2: Select Role
+Search for: "Key Vault Secrets User"
+Select it
+Click Next
+Step 3: Assign to Your App
+Assign access to: Select "Managed identity"
+Click "+ Select members"
+Subscription: Select your subscription
+Managed identity: Select "App Service" from dropdown
+You should see: flask-azure-app-kshitij (your app)
+Click on it to select
+Click "Select" (bottom)
+Click "Review + assign"
+Click "Review + assign" again
+
+Why System-Assigned vs User-Assigned?
+System-assigned (What we need):
+
+✅ Automatically created with the app
+✅ Deleted when app is deleted
+✅ Simpler for single app scenarios
+✅ What our code expects
+User-assigned:
+
+Used for multiple resources sharing same identity
+More complex setup
+Not needed for our use case

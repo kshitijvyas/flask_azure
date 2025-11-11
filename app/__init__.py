@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
+import os
 from app.database import db
 from app.serializers import ma
 from app.config import get_config
@@ -11,6 +12,25 @@ def create_app():
     
     # Load configuration based on FLASK_ENV
     app.config.from_object(get_config())
+
+    # Initialize Application Insights (Monitoring)
+    appinsights_connection_string = os.environ.get('APPLICATIONINSIGHTS_CONNECTION_STRING')
+    if appinsights_connection_string:
+        from opencensus.ext.azure.log_exporter import AzureLogHandler
+        from opencensus.ext.flask.flask_middleware import FlaskMiddleware
+        
+        # Add Flask middleware for automatic request tracking
+        middleware = FlaskMiddleware(
+            app,
+            exporter=AzureLogHandler(connection_string=appinsights_connection_string)
+        )
+        
+        # Configure logging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.addHandler(AzureLogHandler(connection_string=appinsights_connection_string))
+        logger.setLevel(logging.INFO)
+        app.logger.info("Application Insights enabled")
 
     # Initialize extensions
     db.init_app(app)
