@@ -191,3 +191,52 @@ Click "+ Container"
 Name: avatars
 Public access level: Private (we'll use managed identity)
 Click "Create"
+
+Perfect! Got it:
+
+Storage Account: flaskstoragekvyas
+Container: images
+Now let's grant Managed Identity access:
+
+Grant Access (Portal)
+Go to Storage Account "flaskstoragekvyas"
+Click "Access Control (IAM)" in left sidebar
+Click "+ Add" → "Add role assignment"
+Role tab:
+Search: "Storage Blob Data Contributor"
+Select it → Click "Next"
+Members tab:
+Select "Managed identity"
+Click "+ Select members"
+Managed identity dropdown: Choose "App Service"
+Select: "flask-azure-app-kshitij..."
+Click "Select"
+Click "Review + assign" → "Review + assign"
+
+
+***************----------------***********************
+Perfect! Now we need to add the storage configuration to Azure App Service environment variables. Let's do that:
+Add Storage Config via Portal
+Go to Azure Portal → Your App Service (flask-azure-app-kshitij...)
+
+In the left sidebar, find "Settings" section → Click "Environment variables"
+
+Click "+ Add" (under Application settings)
+
+Add these two settings:
+
+First setting:
+
+Name: STORAGE_ACCOUNT_NAME
+Value: flaskstoragekvyas
+Click "Apply"
+Second setting:
+
+Name: STORAGE_CONTAINER_NAME
+Value: images
+Click "Apply"
+Click "Apply" at the bottom of the page
+
+Click "Confirm" when prompted (this will restart your app)
+
+If you are using startup.sh then you need to add this in your stach settings options under Settings -> configuration -> Stack settings
