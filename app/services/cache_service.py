@@ -4,8 +4,11 @@ Handles caching operations using Azure Cache for Redis
 """
 import json
 import redis
+import logging
 from flask import current_app
 import os
+
+logger = logging.getLogger(__name__)
 
 
 class CacheService:
@@ -24,7 +27,7 @@ class CacheService:
         redis_url = os.environ.get('REDIS_URL')
         
         if not redis_url:
-            print("Redis URL not configured. Caching disabled.")
+            logger.warning("Redis URL not configured. Caching disabled.")
             return
         
         try:
@@ -37,9 +40,9 @@ class CacheService:
             )
             # Test connection
             self.redis_client.ping()
-            print("Redis cache connected successfully")
+            logger.info("Redis cache connected successfully")
         except Exception as e:
-            print(f"Redis connection failed: {e}. Caching disabled.")
+            logger.error(f"Redis connection failed: {e}. Caching disabled.")
             self.redis_client = None
     
     def get(self, key):
@@ -63,7 +66,7 @@ class CacheService:
                 return json.loads(value)
             return None
         except Exception as e:
-            print(f"Cache get error: {e}")
+            logger.error(f"Cache get error: {e}")
             return None
     
     def set(self, key, value, ttl=None):
@@ -89,7 +92,7 @@ class CacheService:
             self.redis_client.setex(key, ttl, serialized_value)
             return True
         except Exception as e:
-            print(f"Cache set error: {e}")
+            logger.error(f"Cache set error: {e}")
             return False
     
     def delete(self, key):
@@ -117,7 +120,7 @@ class CacheService:
             else:
                 return self.redis_client.delete(key)
         except Exception as e:
-            print(f"Cache delete error: {e}")
+            logger.error(f"Cache delete error: {e}")
             return 0
     
     def clear_pattern(self, pattern):
@@ -142,7 +145,7 @@ class CacheService:
         try:
             return self.redis_client.exists(key) > 0
         except Exception as e:
-            print(f"Cache exists check error: {e}")
+            logger.error(f"Cache exists check error: {e}")
             return False
 
 

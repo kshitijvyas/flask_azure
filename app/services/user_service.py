@@ -1,7 +1,10 @@
+import logging
 import app.models as models
 import app.serializers as serializers
 import app.database as database
 from app.services.cache_service import cache_service
+
+logger = logging.getLogger(__name__)
 
 class UserService:
 
@@ -11,11 +14,11 @@ class UserService:
         cached_users = cache_service.get(cache_key)
         
         if cached_users is not None:
-            print(f"Cache HIT: {cache_key}")
+            logger.info(f"Cache HIT: {cache_key}")
             return cached_users
         
         # Cache miss - fetch from database
-        print(f"Cache MISS: {cache_key}")
+        logger.info(f"Cache MISS: {cache_key}")
         users = models.User.query.all()
         user_schema = serializers.UserSchema(many=True)
         result = user_schema.dump(users)
@@ -31,11 +34,11 @@ class UserService:
         cached_user = cache_service.get(cache_key)
         
         if cached_user is not None:
-            print(f"Cache HIT: {cache_key}")
+            logger.info(f"Cache HIT: {cache_key}")
             return cached_user
         
         # Cache miss - fetch from database
-        print(f"Cache MISS: {cache_key}")
+        logger.info(f"Cache MISS: {cache_key}")
         user = models.User.query.get_or_404(user_id)
         user_schema = serializers.UserSchema()
         result = user_schema.dump(user)
