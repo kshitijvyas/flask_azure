@@ -5,7 +5,6 @@ Handles caching operations using Azure Cache for Redis
 import json
 import redis
 import logging
-from flask import current_app
 import os
 
 logger = logging.getLogger(__name__)
