@@ -2,6 +2,7 @@ from flask import Flask
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 import os
+import logging
 from app.database import db
 from app.serializers import ma
 from app.config import get_config
@@ -12,6 +13,15 @@ def create_app():
     
     # Load configuration based on FLASK_ENV
     app.config.from_object(get_config())
+    
+    # Configure logging to ensure it appears in Azure Log Stream
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(levelname)s - %(name)s - %(message)s'
+    )
+    
+    # Set Flask app logger level
+    app.logger.setLevel(logging.INFO)
 
     # Initialize Application Insights (Monitoring) with OpenTelemetry
     appinsights_connection_string = os.environ.get('APPLICATIONINSIGHTS_CONNECTION_STRING')
