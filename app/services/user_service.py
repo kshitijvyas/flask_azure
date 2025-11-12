@@ -3,6 +3,7 @@ import app.models as models
 import app.serializers as serializers
 import app.database as database
 from app.services.cache_service import cache_service
+from app.services.queue_service import queue_service
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +55,17 @@ class UserService:
         database.db.session.add(user)
         database.db.session.commit()
         
+        # Get serialized user data
+        result = user_schema.dump(user)
+        
         # Invalidate all users cache when new user is created
         cache_service.delete('users:all')
         
-        return user_schema.dump(user)
+        # Send notification to queue for async processing
+        queue_service.send_user_created_notification(result)
+        logger.info(f"User created and notification queued: {result['username']}")
+        
+        return result
 
     def update_user(self, user_id, data):
         user = models.User.query.get_or_404(user_id)
