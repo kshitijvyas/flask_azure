@@ -62,13 +62,13 @@ class QueueService:
         Returns:
             bool: True if successful, False otherwise
         """
-        self._initialize()
-        
-        if not self.queue_client:
-            logger.warning("Queue client not available. Message not sent.")
-            return False
-        
         try:
+            self._initialize()
+            
+            if not self.queue_client:
+                logger.warning("Queue client not available. Message not sent.")
+                return False
+            
             # Serialize message to JSON
             message_json = json.dumps(message_data)
             
@@ -87,14 +87,23 @@ class QueueService:
         Args:
             user_data: Dictionary with user information (id, username, email)
         """
-        message = {
-            "type": "user_created",
-            "user_id": user_data.get("id"),
-            "username": user_data.get("username"),
-            "email": user_data.get("email"),
-            "timestamp": user_data.get("created_at")
-        }
-        return self.send_message(message)
+        try:
+            # Convert timestamp to string if it's a datetime object
+            timestamp = user_data.get("created_at")
+            if timestamp and hasattr(timestamp, 'isoformat'):
+                timestamp = timestamp.isoformat()
+            
+            message = {
+                "type": "user_created",
+                "user_id": user_data.get("id"),
+                "username": user_data.get("username"),
+                "email": user_data.get("email"),
+                "timestamp": timestamp
+            }
+            return self.send_message(message)
+        except Exception as e:
+            logger.error(f"Error sending user notification: {e}")
+            return False
 
 
 # Singleton instance

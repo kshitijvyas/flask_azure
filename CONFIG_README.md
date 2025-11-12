@@ -240,3 +240,37 @@ Click "Apply" at the bottom of the page
 Click "Confirm" when prompted (this will restart your app)
 
 If you are using startup.sh then you need to add this in your stach settings options under Settings -> configuration -> Stack settings
+
+Implement Redis on azure:
+Search for Azure Cache for Redis
+
+To run any webservice from terminal
+Invoke-WebRequest -Uri "https://flask-azure-app-kshitij-bme9fgf9e4e3chcj.canadacentral-01.azurewebsites.net/api/users/1" -Method GET | Select-Object -ExpandProperty Content
+
+Azure Queues for 
+Created the queue ✅
+Granted the IAM role ✅
+ Azure Storage Queues for async messaging
+✅ Managed Identity authentication for queues
+✅ Decoupling user creation from notifications
+✅ Message serialization with JSON
+
+
+To make azure function:
+1. func init . --python
+2. create a queue-triggered function
+3. func new --name ProcessUserNotifications --template "Azure Queue Storage trigger" --authlevel "function"
+4. func templates list
+
+Next Steps to Test Azure Functions:
+1. Get Storage Account Connection String
+Azure Portal → flaskstoragekvyas
+Left sidebar → Access keys
+Click Show next to Connection string under key1
+Copy the entire connection string
+2. Update local.settings.json
+Open local.settings.json and paste the connection string in the AzureWebJobsStorage value.
+
+3. Install Function Dependencies
+4. Run the Function Locally
+You should see:
