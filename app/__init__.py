@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 import os
 import logging
 from app.database import db
@@ -40,6 +41,7 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     ma.init_app(app)
+    jwt = JWTManager(app)
     
     # Import models BEFORE initializing Migrate (critical for migrations to detect models)
     from app import models
@@ -51,14 +53,29 @@ def create_app():
         db.create_all()
 
     # Register blueprints from routers
+    from app.routers.auth_router import auth_bp
     from app.routers.user_router import user_bp
     from app.routers.department_router import department_bp
     from app.routers.salary_router import salary_bp
     from app.routers.attendance_router import attendance_bp
     
+    app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(department_bp, url_prefix='/api')
     app.register_blueprint(salary_bp, url_prefix='/api')
     app.register_blueprint(attendance_bp, url_prefix='/api')
+    
+    # JWT error handlers
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return {'error': 'Token has expired', 'message': 'Please login again'}, 401
+    
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        return {'error': 'Invalid token', 'message': 'Token verification failed'}, 401
+    
+    @jwt.unauthorized_loader
+    def missing_token_callback(error):
+        return {'error': 'Authorization required', 'message': 'Request does not contain an access token'}, 401
 
     return app

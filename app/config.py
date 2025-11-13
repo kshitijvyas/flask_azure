@@ -33,6 +33,11 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = get_secret('SECRET-KEY') or os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     
+    # JWT Configuration
+    JWT_SECRET_KEY = get_secret('JWT-SECRET-KEY') or os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
+    JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 hour
+    JWT_REFRESH_TOKEN_EXPIRES = 2592000  # 30 days
+    
     # Azure Blob Storage
     STORAGE_ACCOUNT_NAME = os.environ.get('STORAGE_ACCOUNT_NAME', 'flaskstoragekvyas')
     STORAGE_CONTAINER_NAME = os.environ.get('STORAGE_CONTAINER_NAME', 'images')

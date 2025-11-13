@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import db
 
 
@@ -17,6 +18,14 @@ class User(db.Model, UserMixin):
     department = db.relationship('Department', backref='users')
     salaries = db.relationship('Salary', backref='user', lazy=True)
     attendances = db.relationship('Attendance', backref='user', lazy=True)
+    
+    def set_password(self, password):
+        """Hash and set password"""
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Verify password against hash"""
+        return check_password_hash(self.password_hash, password)
 
 
 class Department(db.Model):
